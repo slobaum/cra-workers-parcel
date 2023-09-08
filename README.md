@@ -1,46 +1,14 @@
-# Getting Started with Create React App
+# Add Web Workers to create-react-app using Parcel (eject not required)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Find the original blog post here:  https://carterembry.com/2023/web-workers-react-app-parcel-wo-eject
 
-## Available Scripts
+I've been working on [FidgetMap](https://www.fidgetmap.com/) for a while now. I think I could speed up a lot of processes (including the basic render loop) by adding [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) to handle a lot of the rendering tasks asynchronously. The whole game is drawn by writing RGB data to arrays then compositing them onto a canvas, so it's really a perfect candidate for [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API). It's pretty wild to think it's come this far without any background threads but here we are.
 
-In the project directory, you can run:
+I won't get into a whole history lesson about [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API), suffice to say they will let me pass a lot of rendering to a background thread (multiple background threads in my case) to free up the main execution thread. The whole game should be faster with certain tasks compartmentalized in the background.
 
-### `npm start`
+The main part of the game is drawn directly to a canvas, as mentioned above, but the UI controls such as the menu and interactive buttons are written in React. No point in reinventing the wheel regarding text and flex-style rendering. So I built the project using create-react-app (with Typescript). I want to write my [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) in the same style, preferably in the same source code. But you can't just import Web Worker modules then make them into workers. You have to instantiate a worker with a URL to a separate JavaScript file (or bundle).
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+CRA is great. It hides any configuration and makes it super easy to start a React project. But it's not so great at advanced configuration like this, where you need to compile your app to one JS file and potentially several [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) into separate files. The usual recommendation is to eject from create-react-app. This lets you fiddle with configuration as needed, but with great power comes great responsibility. Once you've ejected, you have to maintain the configuration and scripts yourself. No more easy updating of one well tested project.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+So how can we make different compile targets for different entry points? Parcel to the rescue.  ParcelJS is a zero-configuration build tool that works with Typescript out-of-the-box. You just say "hey Parcel, this entry file" and it Does The Thing™. Enough talk, let me show you how I did it.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
